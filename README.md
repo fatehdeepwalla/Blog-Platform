@@ -28,7 +28,8 @@ authentication, with a React frontend.
   npm install
   npm run dev
   ```
-  
+---
+
 ## Application Access
 
 - The following services are available when the application is running:
@@ -157,4 +158,3 @@ Each component focuses on specific responsibilities while communicating through 
 - Spring Boot backend manages business logic and API endpoints
 - PostgreSQL ensures reliable data persistence
 
----
