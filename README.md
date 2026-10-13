@@ -2,8 +2,7 @@
 
 A full-stack blogging application for creating, editing, organizing, publishing, and discovering blog posts.
 
-- **Frontend**: React and TypeScript for the user interface.
-- **Backend**: Spring Boot for handling application logic, exposing REST APIs for frontend communication, and and managing database operations.
+- **Backend**: Spring Boot for handling application logic, exposing REST APIs, and managing database operations.
 - **Database**:  PostgreSQL for persistent data storage and H2 for testing.
 - **Security & Authentication**: Spring Security and JWT for user authentication.
 - **Containerization**: Docker and Docker Compose are used to containerize application components and to simplify application setup.
@@ -19,9 +18,6 @@ A full-stack blogging application for creating, editing, organizing, publishing,
 | **Persistence & ORM** | Spring Data JPA \| Hibernate |
 | **Validation** | Hibernate Validator |
 | **Database** | PostgreSQL \| H2 (Testing) |
-| **Frontend** | React 18 \| TypeScript \| React Router |
-| **UI & Styling** | Tailwind CSS \| NextUI |
-| **Rich Text Editing** | TipTap |
 | **Object Mapping & Code Generation** | MapStruct \| Lombok |
 | **Build Tools** | Apache Maven \| npm |
 | **Containerization** | Docker \| Docker Compose |
@@ -42,14 +38,6 @@ A full-stack blogging application for creating, editing, organizing, publishing,
   cd backend
   docker compose up --build
 ```
-
-**Run the frontend**
-  ```bash
-  # In a second terminal
-  cd frontend
-  npm install
-  npm run dev
-  ```
 ---
 
 ## 🌐 Application Access
@@ -58,7 +46,6 @@ A full-stack blogging application for creating, editing, organizing, publishing,
 
   | Service | URL / Port | Description |
   |---|---|---|
-  | Frontend | `http://localhost:5173` | Web application interface |
   | Backend API | `localhost:8080` | Handles API requests from the frontend |
   | PostgreSQL | `localhost:5432` | Application database |
   | Adminer | `http://localhost:8888` | Web-based database management interface |
@@ -186,3 +173,45 @@ Each component focuses on specific responsibilities while communicating through 
 - Spring Boot backend manages business logic and API endpoints
 - PostgreSQL ensures reliable data persistence
 
+--- 
+
+## Rest API Overview
+- Our blog platform's REST API provides a comprehensive set of endpoints that enable all the functionality required by our application.
+- We structure these endpoints around four main resources: authentication, posts, categories, and tags.
+- Each group of endpoints follows REST conventions while delivering specific functionality needed by our frontend.
+
+**Authentication Endpoints**
+- The authentication system centers around a single endpoint that manages user sessions.
+- `POST /api/v1/auth/login` handles user authentication by accepting email and password credentials.
+- Upon successful authentication, it returns a JWT token that the frontend uses for subsequent requests.
+- This token-based approach enables stateless authentication while securing our protected endpoints.
+
+**Posts Endpoints**
+- Post management forms the core of our API with endpoints supporting all content operations.
+- `GET /api/v1/posts` retrieves published posts with options for filtering by category or tag.
+- `POST /api/v1/posts` creates new posts, accepting both drafts and published content.
+- `GET /api/v1/posts/{id}` fetches specific posts with full content and metadata.
+- `PUT /api/v1/posts/{id}` updates existing posts, supporting both content and status changes.
+- `DELETE /api/v1/posts/{id}` removes posts from the system.
+- `GET /api/v1/posts/drafts` retrieves draft posts for the authenticated user.
+- These endpoints support rich content creation while maintaining proper access control and content status management.
+
+**Categories Endpoints**
+- Category management endpoints enable content organization.
+- `GET /api/v1/categories` lists all categories with their post counts.
+- `POST /api/v1/categories` creates new categories for content organization.
+- `DELETE /api/v1/categories/{id}` removes unused categories.
+- Each endpoint ensures data integrity by preventing operations that could orphan posts.
+
+**Tags Endpoints**
+- Tag endpoints provide flexible content classification.
+- `GET /api/v1/tags` retrieves all tags with their usage statistics.
+- `POST /api/v1/tags` creates new tags, supporting batch creation for efficiency.
+- `DELETE /api/v1/tags/{id}` removes unused tags from the system.
+- These endpoints maintain the many-to-many relationship between posts and tags while preventing invalid operations.
+
+**Summary**
+- Authentication uses JWT tokens for secure, stateless sessions
+- Post endpoints support full content lifecycle management
+- Category endpoints maintain primary content organization
+- Tag endpoints enable flexible content classification
