@@ -1,6 +1,6 @@
 # Blog Platform
 
-A Spring Boot-based REST API for creating, editing, organizing, publishing, and discovering blog posts.
+A Spring Boot based REST API for creating, editing, organizing, publishing, and discovering blog posts.
 
 - **Backend**: Spring Boot for handling application logic, exposing REST APIs, and managing database operations.
 - **Database**:  PostgreSQL for persistent data storage and H2 for testing.
