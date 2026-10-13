@@ -67,10 +67,16 @@ A full-stack blogging application for creating, editing, organizing, publishing,
 
   | Setting | Value |
   |---|---|
-  | System | PostgreSQL |
-  | Server | db |
-  | Username | postgres |
-  | Password | changemeinprod! |
+  | System | `PostgreSQL` |
+  | Server | `db` |
+  | Username | `postgres` |
+  | Password | `changemeinprod!` |
+
+- Default Login Credentials: Use the following credentials to log in to the application:
+  | Field | Value |
+  |---|---|
+  | **Email** | `user@test.com` |
+  | **Password** | `password` |
 
 ---
 
