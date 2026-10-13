@@ -28,7 +28,7 @@ A full-stack blogging application for creating, editing, organizing, publishing,
 
 ---
 
-## Running Application
+## 🚀 Running Application
 **Prerequisites**
 - Docker
 - Node.js 20 or later
@@ -52,7 +52,7 @@ A full-stack blogging application for creating, editing, organizing, publishing,
   ```
 ---
 
-## Application Access
+## 🌐 Application Access
 
 - The following services are available when the application is running:
 
@@ -74,7 +74,7 @@ A full-stack blogging application for creating, editing, organizing, publishing,
 
 ---
 
-## The Project Brief
+## 📋 The Project Brief
 Our project is a Blog Platform that will allow writers to create, manage, and organize their content effectively.
 
 **Core Concepts**
@@ -96,7 +96,7 @@ Our project is a Blog Platform that will allow writers to create, manage, and or
 
 ---
 
-## Domain Overview
+## 🧩 Domain Overview
 
 These objects and their relationships form the foundation of our application's data model.
 
@@ -139,7 +139,7 @@ These objects and their relationships form the foundation of our application's d
 
 ---
 
-## Architecture Overview
+## 🏗️ Architecture Overview
 
 Our blog platform uses a three-tier architecture that consists of a React frontend, Spring Boot backend, and PostgreSQL database.
 
