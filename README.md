@@ -19,7 +19,7 @@ A full-stack blogging application for creating, editing, organizing, publishing,
 | **Validation** | Hibernate Validator |
 | **Database** | PostgreSQL \| H2 (Testing) |
 | **Object Mapping & Code Generation** | MapStruct \| Lombok |
-| **Build Tools** | Apache Maven \| npm |
+| **Build Tools** | Apache Maven |
 | **Containerization** | Docker \| Docker Compose |
 
 ---
