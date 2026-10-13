@@ -1,7 +1,12 @@
 # Blog Platform
 
-The Blog Platform is a blogging application built with Spring Boot and Spring Security, using JWT
-authentication, with a React frontend.
+A full-stack blogging application for creating, editing, organizing, publishing, and discovering blog posts.
+
+- **Frontend**: Built with React and TypeScript to deliver an interactive user interface.
+- **Backend**: Powered by Spring Boot, exposing REST APIs for communication between the frontend and server.
+- **Database**: Uses PostgreSQL for persistent data storage.
+- **Security & Authentication**: Implements Spring Security and JWT-based authentication.
+- **Containerization**: Uses Docker and Docker Compose to simplify application setup and manage the backend and supporting services.
 
 ---
 
@@ -13,6 +18,22 @@ authentication, with a React frontend.
 | `frontend/` | The React frontend       |
 
 ---
+
+## 🛠️ Tech Stack
+
+| **Layer** | **Technology** |
+|---|---|
+| **Backend** | Java 21 \| Spring Boot 3.4.0 \| Spring MVC |
+| **Security & Authentication** | Spring Security \| JWT |
+| **Persistence & ORM** | Spring Data JPA \| Hibernate |
+| **Validation** | Hibernate Validator |
+| **Database** | PostgreSQL \| H2 (Testing) |
+| **Frontend** | React 18 \| TypeScript \| React Router |
+| **UI & Styling** | Tailwind CSS \| NextUI |
+| **Rich Text Editing** | TipTap |
+| **Object Mapping & Code Generation** | MapStruct \| Lombok |
+| **Build Tools** | Apache Maven \| npm |
+| **Containerization** | Docker \| Docker Compose |
 
 ## Running Application
 
