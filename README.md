@@ -2,20 +2,11 @@
 
 A full-stack blogging application for creating, editing, organizing, publishing, and discovering blog posts.
 
-- **Frontend**: Built with React and TypeScript to deliver an interactive user interface.
-- **Backend**: Powered by Spring Boot, exposing REST APIs for communication between the frontend and server.
-- **Database**: Uses PostgreSQL for persistent data storage.
-- **Security & Authentication**: Implements Spring Security and JWT-based authentication.
-- **Containerization**: Uses Docker and Docker Compose to simplify application setup and manage the backend and supporting services.
-
----
-
-## What's In This Repo
-
-| Directory   | Contents                 |
-| ----------- | ------------------------ |
-| `backend/`  | The Spring Boot backend  |
-| `frontend/` | The React frontend       |
+- **Frontend**: React and TypeScript for the user interface.
+- **Backend**: Spring Boot for handling application logic, exposing REST APIs for frontend communication, and and managing database operations.
+- **Database**:  PostgreSQL for persistent data storage and H2 for testing.
+- **Security & Authentication**: Spring Security and JWT for user authentication.
+- **Containerization**: Docker and Docker Compose are used to containerize application components and to simplify application setup.
 
 ---
 
@@ -35,16 +26,26 @@ A full-stack blogging application for creating, editing, organizing, publishing,
 | **Build Tools** | Apache Maven \| npm |
 | **Containerization** | Docker \| Docker Compose |
 
+---
+
 ## Running Application
-
-- You'll need Docker and Node 20 (or later).
-
+**Prerequisites**
+- Docker
+- Node.js 20 or later
+  
+**Start the Backend and Supporting Services**
   ```bash
-  # Start PostgreSQL (and Adminer) and run the backend
+  # Start PostgreSQL database
+  # Start Adminer (web-based database management interface)
+  # Build and start Spring Boot Application
+  # This will launch three Docker Containers
   cd backend
   docker compose up --build
-  
-  # Run the frontend, in a second terminal
+```
+
+**Run the frontend**
+  ```bash
+  # In a second terminal
   cd frontend
   npm install
   npm run dev
