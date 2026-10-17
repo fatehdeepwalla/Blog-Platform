@@ -50,7 +50,13 @@ const CategoriesPage: React.FC<{ isAuthenticated: boolean }> = ({ isAuthenticate
       </TableBody>
     </Table>
   </CardBody></Card>
-  <Modal isOpen={isOpen} onClose={closeModal}><ModalContent><ModalHeader>{editingCategory ? "Edit category" : "Add category"}</ModalHeader><ModalBody><Input autoFocus label="Category name" value={newCategoryName} onChange={event => setNewCategoryName(event.target.value)} isRequired maxLength={50} /></ModalBody><ModalFooter><Button variant="flat" onClick={closeModal}>Cancel</Button><Button color="primary" onClick={handleAddEdit} isLoading={isSubmitting}>{editingCategory ? "Save changes" : "Add category"}</Button></ModalFooter></Modal>
+  <Modal isOpen={isOpen} onClose={closeModal}>
+    <ModalContent>
+      <ModalHeader>{editingCategory ? "Edit category" : "Add category"}</ModalHeader>
+      <ModalBody><Input autoFocus label="Category name" value={newCategoryName} onChange={event => setNewCategoryName(event.target.value)} isRequired maxLength={50} /></ModalBody>
+      <ModalFooter><Button variant="flat" onClick={closeModal}>Cancel</Button><Button color="primary" onClick={handleAddEdit} isLoading={isSubmitting}>{editingCategory ? "Save changes" : "Add category"}</Button></ModalFooter>
+    </ModalContent>
+  </Modal>
   </div>;
 };
 export default CategoriesPage;
