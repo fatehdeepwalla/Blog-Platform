@@ -125,7 +125,7 @@ These objects and their relationships form the foundation of our application's d
 **Tag**
 - Tags offer a flexible way to classify content beyond the primary categorization.
 - Each tag has a unique identifier and name, and it can be associated with any number of posts. Unlike categories, tags are optional and posts can have multiple tags.
-- We track the number of posts associated with each tag to help users discover related content.
+- We track the number of published posts associated with each tag to help users discover related content.
 - Tags enable cross-cutting content organization that complements the hierarchical category structure.
 
 **Domain Relationships**
