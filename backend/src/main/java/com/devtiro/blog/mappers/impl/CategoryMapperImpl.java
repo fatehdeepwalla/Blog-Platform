@@ -1,5 +1,6 @@
 package com.devtiro.blog.mappers.impl;
 
+import com.devtiro.blog.domain.PostStatus;
 import com.devtiro.blog.domain.dtos.CategoryDto;
 import com.devtiro.blog.domain.dtos.CreateCategoryRequest;
 import com.devtiro.blog.domain.entities.Category;
@@ -13,7 +14,10 @@ public class CategoryMapperImpl implements CategoryMapper {
         return CategoryDto.builder()
                 .id(category.getId())
                 .name(category.getName())
-                .postCount(category.getPosts() == null ? 0 : category.getPosts().size())
+                .postCount(category.getPosts() == null ? 0L :
+                        category.getPosts().stream()
+                                .filter(post -> PostStatus.PUBLISHED.equals(post.getStatus()))
+                                .count())
                 .build();
     }
 

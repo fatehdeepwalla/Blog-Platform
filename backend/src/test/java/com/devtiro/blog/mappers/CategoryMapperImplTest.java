@@ -32,7 +32,7 @@ class CategoryMapperImplTest {
         CategoryDto dto = mapper.toDto(category);
         assertEquals(categoryId, dto.getId());
         assertEquals("Engineering", dto.getName());
-        assertEquals(2L, dto.getPostCount());
+        assertEquals(1L, dto.getPostCount());
     }
 
     @Test
