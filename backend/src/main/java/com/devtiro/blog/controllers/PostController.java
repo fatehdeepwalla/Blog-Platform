@@ -52,8 +52,8 @@ public class PostController {
             @Valid @RequestBody CreatePostRequestDto createPostRequestDto,
             @RequestAttribute UUID userId) {
         User loggedInUser = userService.getUserById(userId);
-        CreatePostRequest request = postMapper.toCreatePostRequest(createPostRequestDto);
-        Post createdPost = postService.createPost(loggedInUser, request);
+        CreatePostRequest createPostRequest = postMapper.toCreatePostRequest(createPostRequestDto);
+        Post createdPost = postService.createPost(loggedInUser, createPostRequest);
         return new ResponseEntity<>(postMapper.toDto(createdPost), HttpStatus.CREATED);
     }
 
@@ -62,15 +62,24 @@ public class PostController {
             @PathVariable UUID id,
             @Valid @RequestBody UpdatePostRequestDto updatePostRequestDto,
             @RequestAttribute UUID userId) {
-        UpdatePostRequest request = postMapper.toUpdatePostRequest(updatePostRequestDto);
-        Post updatedPost = postService.updatePost(id, userId, request);
+        if (!id.equals(updatePostRequestDto.getId())) {
+            throw new IllegalArgumentException("The post ID in the URL must match the request body");
+        }
+        UpdatePostRequest updatePostRequest = postMapper.toUpdatePostRequest(updatePostRequestDto);
+        Post updatedPost = postService.updatePost(id, userId, updatePostRequest);
         return ResponseEntity.ok(postMapper.toDto(updatedPost));
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<PostDto> getPost(@PathVariable UUID id) {
+    public ResponseEntity<PostDto> getPost(
+            @PathVariable UUID id,
+            @RequestAttribute(value = "userId", required = false) UUID userId) {
         Post post = postService.getPost(id);
-        if (post.getStatus() != PostStatus.PUBLISHED) {
+        boolean isPublished = post.getStatus() == PostStatus.PUBLISHED;
+        boolean isOwner = userId != null && post.getAuthor() != null
+                && userId.equals(post.getAuthor().getId());
+
+        if (!isPublished && !isOwner) {
             throw new EntityNotFoundException("Post does not exist with ID " + id);
         }
         return ResponseEntity.ok(postMapper.toDto(post));

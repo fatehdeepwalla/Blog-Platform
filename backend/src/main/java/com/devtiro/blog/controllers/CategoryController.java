@@ -25,9 +25,9 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<List<CategoryDto>> listCategories() {
         List<CategoryDto> categories = categoryService.listCategories()
-                .stream().map(categoryMapper::toDto)
+                .stream()
+                .map(categoryMapper::toDto)
                 .toList();
-
         return ResponseEntity.ok(categories);
     }
 
@@ -36,15 +36,21 @@ public class CategoryController {
             @Valid @RequestBody CreateCategoryRequest createCategoryRequest) {
         Category categoryToCreate = categoryMapper.toEntity(createCategoryRequest);
         Category savedCategory = categoryService.createCategory(categoryToCreate);
-        return new ResponseEntity<>(
-                categoryMapper.toDto(savedCategory),
-                HttpStatus.CREATED
-        );
+        return new ResponseEntity<>(categoryMapper.toDto(savedCategory), HttpStatus.CREATED);
+    }
+
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<CategoryDto> updateCategory(
+            @PathVariable UUID id,
+            @Valid @RequestBody CreateCategoryRequest updateCategoryRequest) {
+        Category category = categoryMapper.toEntity(updateCategoryRequest);
+        Category updatedCategory = categoryService.updateCategory(id, category);
+        return ResponseEntity.ok(categoryMapper.toDto(updatedCategory));
     }
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) {
         categoryService.deleteCategory(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.noContent().build();
     }
 }

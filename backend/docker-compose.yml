@@ -1,22 +1,27 @@
 services:
-  # Our PostgreSQL database
   db:
-    # Using the latest PostgreSQL image
-    image: postgres:latest
+    image: postgres:16
     ports:
       - "5432:5432"
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: changemeinprod!
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
 
-  # Database management interface
   adminer:
     image: adminer:latest
-    restart: always
+    restart: unless-stopped
     ports:
-      - 8888:8080
+      - "8888:8080"
+    depends_on:
+      db:
+        condition: service_healthy
 
-  # Spring Boot backend
   backend:
     build: .
     ports:
@@ -28,4 +33,5 @@ services:
       SPRING_DATASOURCE_PASSWORD: changemeinprod!
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET to a strong random value of at least 32 bytes}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
