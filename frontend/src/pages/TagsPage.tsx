@@ -45,7 +45,13 @@ const TagsPage: React.FC<{ isAuthenticated: boolean }> = ({ isAuthenticated }) =
       {tags.map(tag => <TableRow key={tag.id}><TableCell>{tag.name}</TableCell><TableCell>{tag.postCount ?? 0}</TableCell><TableCell>{isAuthenticated ? <Tooltip content={tag.postCount ? "Cannot delete a tag that has posts" : "Delete tag"}><Button isIconOnly aria-label={`Delete ${tag.name}`} variant="flat" color="danger" size="sm" onClick={() => handleDelete(tag)} isDisabled={(tag.postCount ?? 0) > 0}><Trash2 size={16} /></Button></Tooltip> : <span>—</span>}</TableCell></TableRow>)}
     </TableBody></Table>
   </CardBody></Card>
-  <Modal isOpen={isOpen} onClose={() => { setNewTags([]); setTagInput(""); onClose(); }}><ModalContent><ModalHeader>Add tags</ModalHeader><ModalBody><Input label="Tag name" placeholder="Type a tag and press Enter" value={tagInput} onChange={event => setTagInput(event.target.value)} onKeyDown={event => { if (event.key === "Enter" || event.key === ",") { event.preventDefault(); addInputTag(); } }} /><div className="flex flex-wrap gap-2">{newTags.map(tag => <Chip key={tag} onClose={() => setNewTags(current => current.filter(item => item !== tag))} variant="flat" endContent={<X size={14} />}>{tag}</Chip>)}</div></ModalBody><ModalFooter><Button variant="flat" onClick={() => { setNewTags([]); setTagInput(""); onClose(); }}>Cancel</Button><Button color="primary" onClick={handleAddTags} isLoading={isSubmitting} isDisabled={!newTags.length && !tagInput.trim()}>Add tags</Button></ModalFooter></Modal>
+  <Modal isOpen={isOpen} onClose={() => { setNewTags([]); setTagInput(""); onClose(); }}>
+    <ModalContent>
+      <ModalHeader>Add tags</ModalHeader>
+      <ModalBody><Input label="Tag name" placeholder="Type a tag and press Enter" value={tagInput} onChange={event => setTagInput(event.target.value)} onKeyDown={event => { if (event.key === "Enter" || event.key === ",") { event.preventDefault(); addInputTag(); } }} /><div className="flex flex-wrap gap-2">{newTags.map(tag => <Chip key={tag} onClose={() => setNewTags(current => current.filter(item => item !== tag))} variant="flat" endContent={<X size={14} />}>{tag}</Chip>)}</div></ModalBody>
+      <ModalFooter><Button variant="flat" onClick={() => { setNewTags([]); setTagInput(""); onClose(); }}>Cancel</Button><Button color="primary" onClick={handleAddTags} isLoading={isSubmitting} isDisabled={!newTags.length && !tagInput.trim()}>Add tags</Button></ModalFooter>
+    </ModalContent>
+  </Modal>
   </div>;
 };
 export default TagsPage;
