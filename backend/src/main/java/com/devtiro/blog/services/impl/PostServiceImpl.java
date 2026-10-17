@@ -33,6 +33,7 @@ public class PostServiceImpl implements PostService {
     private static final int WORDS_PER_MINUTE = 200;
 
     @Override
+    @Transactional(readOnly = true)
     public Post getPost(UUID id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Post does not exist with ID " + id));
@@ -44,33 +45,21 @@ public class PostServiceImpl implements PostService {
         if(categoryId != null && tagId != null) {
             Category category = categoryService.getCategoryById(categoryId);
             Tag tag = tagService.getTagById(tagId);
-            return postRepository.findAllByStatusAndCategoryAndTagsContaining(
-                    PostStatus.PUBLISHED,
-                    category,
-                    tag
-            );
+            return postRepository.findAllByStatusAndCategoryAndTagsContaining(PostStatus.PUBLISHED, category, tag);
         }
-
         if(categoryId != null) {
             Category category = categoryService.getCategoryById(categoryId);
-            return postRepository.findAllByStatusAndCategory(
-                    PostStatus.PUBLISHED,
-                    category
-            );
+            return postRepository.findAllByStatusAndCategory(PostStatus.PUBLISHED, category);
         }
-
         if(tagId != null) {
             Tag tag = tagService.getTagById(tagId);
-            return postRepository.findAllByStatusAndTagsContaining(
-                    PostStatus.PUBLISHED,
-                    tag
-            );
+            return postRepository.findAllByStatusAndTagsContaining(PostStatus.PUBLISHED, tag);
         }
-
         return postRepository.findAllByStatus(PostStatus.PUBLISHED);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Post> getDraftPosts(User user) {
         return postRepository.findAllByAuthorAndStatus(user, PostStatus.DRAFT);
     }
@@ -97,9 +86,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Post updatePost(UUID id, UpdatePostRequest updatePostRequest) {
-        Post existingPost = postRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Post does not exist with id " + id));
+    public Post updatePost(UUID id, UUID userId, UpdatePostRequest updatePostRequest) {
+        Post existingPost = getPost(id);
+        ensureOwner(existingPost, userId);
 
         existingPost.setTitle(updatePostRequest.getTitle());
         String postContent = updatePostRequest.getContent();
@@ -107,35 +96,40 @@ public class PostServiceImpl implements PostService {
         existingPost.setStatus(updatePostRequest.getStatus());
         existingPost.setReadingTime(calculateReadingTime(postContent));
 
-        UUID updatePostRequestCategoryId = updatePostRequest.getCategoryId();
-        if(!existingPost.getCategory().getId().equals(updatePostRequestCategoryId)) {
-            Category newCategory = categoryService.getCategoryById(updatePostRequestCategoryId);
-            existingPost.setCategory(newCategory);
+        UUID categoryId = updatePostRequest.getCategoryId();
+        if(!existingPost.getCategory().getId().equals(categoryId)) {
+            existingPost.setCategory(categoryService.getCategoryById(categoryId));
         }
 
         Set<UUID> existingTagIds = existingPost.getTags().stream().map(Tag::getId).collect(Collectors.toSet());
-        Set<UUID> updatePostRequestTagIds = updatePostRequest.getTagIds();
-        if(!existingTagIds.equals(updatePostRequestTagIds)) {
-            List<Tag> newTags = tagService.getTagByIds(updatePostRequestTagIds);
-            existingPost.setTags(new HashSet<>(newTags));
+        Set<UUID> updatedTagIds = updatePostRequest.getTagIds();
+        if(!existingTagIds.equals(updatedTagIds)) {
+            existingPost.setTags(new HashSet<>(tagService.getTagByIds(updatedTagIds)));
         }
 
         return postRepository.save(existingPost);
     }
 
     @Override
-    public void deletePost(UUID id) {
+    @Transactional
+    public void deletePost(UUID id, UUID userId) {
         Post post = getPost(id);
+        ensureOwner(post, userId);
         postRepository.delete(post);
     }
 
+    private void ensureOwner(Post post, UUID userId) {
+        if (post.getAuthor() == null || !post.getAuthor().getId().equals(userId)) {
+            // Use 404 rather than 403 to avoid confirming another user's post exists.
+            throw new EntityNotFoundException("Post does not exist with ID " + post.getId());
+        }
+    }
+
     private Integer calculateReadingTime(String content) {
-        if(content == null || content.isEmpty()) {
+        if(content == null || content.isBlank()) {
             return 0;
         }
-
         int wordCount = content.trim().split("\\s+").length;
         return (int) Math.ceil((double) wordCount / WORDS_PER_MINUTE);
     }
-
 }

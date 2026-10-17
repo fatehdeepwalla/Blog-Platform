@@ -5,6 +5,7 @@ import com.devtiro.blog.domain.dtos.TagDto;
 import com.devtiro.blog.domain.entities.Tag;
 import com.devtiro.blog.mappers.TagMapper;
 import com.devtiro.blog.services.TagService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,19 +24,15 @@ public class TagController {
 
     @GetMapping
     public ResponseEntity<List<TagDto>> getAllTags() {
-        List<Tag> tags = tagService.getTags();
-        List<TagDto> tagRespons = tags.stream().map(tagMapper::toTagResponse).toList();
-        return ResponseEntity.ok(tagRespons);
+        List<TagDto> tags = tagService.getTags().stream().map(tagMapper::toTagResponse).toList();
+        return ResponseEntity.ok(tags);
     }
 
     @PostMapping
-    public ResponseEntity<List<TagDto>> createTags(@RequestBody CreateTagsRequest createTagsRequest) {
-        List<Tag> savedTags = tagService.createTags(createTagsRequest.getNames());
-        List<TagDto> createdTagRespons = savedTags.stream().map(tagMapper::toTagResponse).toList();
-        return new ResponseEntity<>(
-                createdTagRespons,
-                HttpStatus.CREATED
-        );
+    public ResponseEntity<List<TagDto>> createTags(@Valid @RequestBody CreateTagsRequest createTagsRequest) {
+        List<TagDto> tags = tagService.createTags(createTagsRequest.getNames())
+                .stream().map(tagMapper::toTagResponse).toList();
+        return new ResponseEntity<>(tags, HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/{id}")
@@ -43,5 +40,4 @@ public class TagController {
         tagService.deleteTag(id);
         return ResponseEntity.noContent().build();
     }
-
 }

@@ -26,5 +26,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: changemeinprod!
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET to a strong random value of at least 32 bytes}
     depends_on:
       - db

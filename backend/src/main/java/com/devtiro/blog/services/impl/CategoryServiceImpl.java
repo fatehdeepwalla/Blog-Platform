@@ -4,7 +4,7 @@ import com.devtiro.blog.domain.entities.Category;
 import com.devtiro.blog.repositories.CategoryRepository;
 import com.devtiro.blog.services.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +19,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Category> listCategories() {
         return categoryRepository.findAllWithPostCount();
     }
@@ -34,6 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteCategory(UUID id) {
         Optional<Category> category = categoryRepository.findById(id);
         if(category.isPresent()) {
@@ -45,6 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Category getCategoryById(UUID id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id" + id));

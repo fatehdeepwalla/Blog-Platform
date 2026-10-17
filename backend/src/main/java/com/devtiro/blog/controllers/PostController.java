@@ -1,6 +1,7 @@
 package com.devtiro.blog.controllers;
 
 import com.devtiro.blog.domain.CreatePostRequest;
+import com.devtiro.blog.domain.PostStatus;
 import com.devtiro.blog.domain.UpdatePostRequest;
 import com.devtiro.blog.domain.dtos.CreatePostRequestDto;
 import com.devtiro.blog.domain.dtos.PostDto;
@@ -10,6 +11,7 @@ import com.devtiro.blog.domain.entities.User;
 import com.devtiro.blog.mappers.PostMapper;
 import com.devtiro.blog.services.PostService;
 import com.devtiro.blog.services.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,16 +34,16 @@ public class PostController {
     public ResponseEntity<List<PostDto>> getAllPosts(
             @RequestParam(required = false) UUID categoryId,
             @RequestParam(required = false) UUID tagId) {
-        List<Post> posts = postService.getAllPosts(categoryId, tagId);
-        List<PostDto> postDtos = posts.stream().map(postMapper::toDto).toList();
+        List<PostDto> postDtos = postService.getAllPosts(categoryId, tagId)
+                .stream().map(postMapper::toDto).toList();
         return ResponseEntity.ok(postDtos);
     }
 
     @GetMapping(path = "/drafts")
     public ResponseEntity<List<PostDto>> getDrafts(@RequestAttribute UUID userId) {
         User loggedInUser = userService.getUserById(userId);
-        List<Post> draftPosts = postService.getDraftPosts(loggedInUser);
-        List<PostDto> postDtos = draftPosts.stream().map(postMapper::toDto).toList();
+        List<PostDto> postDtos = postService.getDraftPosts(loggedInUser)
+                .stream().map(postMapper::toDto).toList();
         return ResponseEntity.ok(postDtos);
     }
 
@@ -50,35 +52,35 @@ public class PostController {
             @Valid @RequestBody CreatePostRequestDto createPostRequestDto,
             @RequestAttribute UUID userId) {
         User loggedInUser = userService.getUserById(userId);
-        CreatePostRequest createPostRequest = postMapper.toCreatePostRequest(createPostRequestDto);
-        Post createdPost = postService.createPost(loggedInUser, createPostRequest);
-        PostDto createdPostDto = postMapper.toDto(createdPost);
-        return new ResponseEntity<>(createdPostDto, HttpStatus.CREATED);
+        CreatePostRequest request = postMapper.toCreatePostRequest(createPostRequestDto);
+        Post createdPost = postService.createPost(loggedInUser, request);
+        return new ResponseEntity<>(postMapper.toDto(createdPost), HttpStatus.CREATED);
     }
 
     @PutMapping(path = "/{id}")
     public ResponseEntity<PostDto> updatePost(
             @PathVariable UUID id,
-            @Valid @RequestBody UpdatePostRequestDto updatePostRequestDto) {
-        UpdatePostRequest updatePostRequest = postMapper.toUpdatePostRequest(updatePostRequestDto);
-        Post updatedPost = postService.updatePost(id, updatePostRequest);
-        PostDto updatedPostDto = postMapper.toDto(updatedPost);
-        return ResponseEntity.ok(updatedPostDto);
+            @Valid @RequestBody UpdatePostRequestDto updatePostRequestDto,
+            @RequestAttribute UUID userId) {
+        UpdatePostRequest request = postMapper.toUpdatePostRequest(updatePostRequestDto);
+        Post updatedPost = postService.updatePost(id, userId, request);
+        return ResponseEntity.ok(postMapper.toDto(updatedPost));
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<PostDto> getPost(
-            @PathVariable UUID id
-    ) {
+    public ResponseEntity<PostDto> getPost(@PathVariable UUID id) {
         Post post = postService.getPost(id);
-        PostDto postDto = postMapper.toDto(post);
-        return ResponseEntity.ok(postDto);
+        if (post.getStatus() != PostStatus.PUBLISHED) {
+            throw new EntityNotFoundException("Post does not exist with ID " + id);
+        }
+        return ResponseEntity.ok(postMapper.toDto(post));
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable UUID id) {
-        postService.deletePost(id);
+    public ResponseEntity<Void> deletePost(
+            @PathVariable UUID id,
+            @RequestAttribute UUID userId) {
+        postService.deletePost(id, userId);
         return ResponseEntity.noContent().build();
     }
-
 }
