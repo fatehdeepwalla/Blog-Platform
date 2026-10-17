@@ -1,109 +1,71 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { apiService } from '../services/apiService';
-
-interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-}
+import { apiService, UserProfile } from '../services/apiService';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: AuthUser | null;
+  isAuthLoading: boolean;
+  user: UserProfile | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   token: string | null;
 }
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
-
-  // Initialize auth state from token
-  useEffect(() => {
-    const initializeAuth = async () => {
-      const storedToken = localStorage.getItem('token');
-      if (storedToken) {
-        try {
-          // TODO: Add endpoint to fetch user profile
-          // const userProfile = await apiService.getUserProfile();
-          // setUser(userProfile);
-          setIsAuthenticated(true);
-          setToken(storedToken);
-        } catch (error) {
-          // If token is invalid, clear authentication
-          localStorage.removeItem('token');
-          setIsAuthenticated(false);
-          setUser(null);
-          setToken(null);
-        }
-      }
-    };
-
-    initializeAuth();
-  }, []);
-
-  const login = useCallback(async (email: string, password: string) => {
-    try {
-      const response = await apiService.login({ email, password });
-      
-      localStorage.setItem('token', response.token);
-      setToken(response.token);
-      setIsAuthenticated(true);
-
-      // TODO: Add endpoint to fetch user profile after login
-      // const userProfile = await apiService.getUserProfile();
-      // setUser(userProfile);
-    } catch (error) {
-      throw error;
-    }
-  }, []);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(Boolean(localStorage.getItem('token')));
 
   const logout = useCallback(() => {
     localStorage.removeItem('token');
-    setIsAuthenticated(false);
-    setUser(null);
+    apiService.logout();
     setToken(null);
-    apiService.logout(); // This clears the token from apiService
+    setUser(null);
+    setIsAuthenticated(false);
+    setIsAuthLoading(false);
   }, []);
 
-  // Update apiService token when it changes
   useEffect(() => {
-    if (token) {
-      // Update axios instance configuration
-      const axiosInstance = apiService['api'];
-      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
+    let active = true;
+    const loadUser = async () => {
+      if (!token) {
+        if (active) { setIsAuthenticated(false); setUser(null); setIsAuthLoading(false); }
+        return;
+      }
+      setIsAuthLoading(true);
+      try {
+        const profile = await apiService.getCurrentUser();
+        if (active) { setUser(profile); setIsAuthenticated(true); }
+      } catch {
+        if (active) {
+          localStorage.removeItem('token');
+          apiService.logout();
+          setToken(null);
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } finally {
+        if (active) setIsAuthLoading(false);
+      }
+    };
+    void loadUser();
+    return () => { active = false; };
   }, [token]);
 
-  const value = {
-    isAuthenticated,
-    user,
-    login,
-    logout,
-    token
-  };
+  const login = useCallback(async (email: string, password: string) => {
+    const response = await apiService.login({ email, password });
+    localStorage.setItem('token', response.token);
+    setToken(response.token);
+  }, []);
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ isAuthenticated, isAuthLoading, user, login, logout, token }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };
-
 export default AuthContext;

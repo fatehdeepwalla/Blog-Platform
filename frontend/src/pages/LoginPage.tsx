@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiService } from '../services/apiService';
 import { useAuth } from '../components/AuthContext';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('user@test.com');
+  const [password, setPassword] = useState('password');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -15,83 +14,44 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-
     try {
-      const response = await apiService.login({ email, password });
-      login(response);
-      navigate('/');
-    } catch (err: any) {
-      setError(err.message || 'Failed to login. Please try again.');
+      await login(email.trim(), password);
+      navigate('/', { replace: true });
+    } catch (err) {
+      const apiError = err as { message?: string };
+      setError(apiError.message || 'Unable to sign in. Check your credentials and try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-[70vh] flex items-center justify-center px-4">
+      <div className="max-w-md w-full space-y-8 bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
+          <p className="text-sm font-semibold uppercase tracking-widest text-indigo-600">Welcome back</p>
+          <h1 className="mt-2 text-3xl font-bold text-gray-900">Sign in to Blog Platform</h1>
+          <p className="mt-2 text-sm text-gray-600">Use your account to create posts and manage drafts.</p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-              />
-            </div>
-          </div>
-
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="flex">
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">{error}</h3>
-                </div>
-              </div>
-            </div>
-          )}
-
+        <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Signing in...' : 'Sign in'}
-            </button>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+            <input id="email" name="email" type="email" autoComplete="email" required
+              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} />
           </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input id="password" name="password" type="password" autoComplete="current-password" required
+              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
+          </div>
+          {error && <div role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>}
+          <button type="submit" disabled={isLoading}
+            className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 font-semibold text-white hover:bg-indigo-700 disabled:opacity-50">
+            {isLoading ? 'Signing in…' : 'Sign in'}
+          </button>
+          <p className="text-xs text-gray-500">Local demo account: user@test.com / password</p>
         </form>
       </div>
     </div>

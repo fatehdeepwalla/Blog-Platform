@@ -12,7 +12,7 @@ import java.util.UUID;
 @Repository
 public interface TagRepository extends JpaRepository<Tag, UUID> {
 
-    @Query("SELECT t FROM Tag t LEFT JOIN FETCH t.posts")
+    @Query("SELECT DISTINCT t FROM Tag t LEFT JOIN FETCH t.posts")
     List<Tag> findAllWithPostCount();
 
     List<Tag> findByNameIn(Set<String> names);

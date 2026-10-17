@@ -8,17 +8,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CategoryMapperImpl implements CategoryMapper {
+    @Override
+    public CategoryDto toDto(Category category) {
+        return CategoryDto.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .postCount(category.getPosts() == null ? 0 : category.getPosts().size())
+                .build();
+    }
 
-  @Override
-  public CategoryDto toDto(Category category) {
-    return CategoryDto.builder()
-        .name(category.getName())
-        // all values
-        .build();
-  }
-
-  @Override
-  public Category toEntity(CreateCategoryRequest createCategoryRequest) {
-    return null;
-  }
+    @Override
+    public Category toEntity(CreateCategoryRequest createCategoryRequest) {
+        return Category.builder().name(createCategoryRequest.getName().trim()).build();
+    }
 }
