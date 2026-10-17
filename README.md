@@ -5,6 +5,8 @@
 - **Database**:  PostgreSQL for persistent data storage and H2 for testing.
 - **Security & Authentication**: Spring Security and JWT for user authentication.
 - **Containerization**: Docker and Docker Compose are used to containerize application components and to simplify application setup.
+  
+> **Note:** This App also has frontend component built using React, TypeScript, and Vite. The frontend was developed with **AI assistance** and integrates with the Spring Boot REST API. Frontend implementation details are kept brief, as the primary focus of this project is on the backend, which was my own effort.
 
 ---
 
@@ -37,6 +39,14 @@
   cd backend
   docker compose up --build
 ```
+
+**Run the frontend**
+  ```bash
+  # In a second terminal
+  cd frontend
+  npm install
+  npm run dev
+  ```
 ---
 
 ## 🌐 Application Access
@@ -45,6 +55,7 @@
 
   | Service | URL / Port | Description |
   |---|---|---|
+  | Frontend | `http://localhost:5173` | Web application interface |
   | Backend API | `localhost:8080` | Handles API requests from the frontend |
   | PostgreSQL | `localhost:5432` | Application database |
   | Adminer | `http://localhost:8888` | Web-based database management interface |
